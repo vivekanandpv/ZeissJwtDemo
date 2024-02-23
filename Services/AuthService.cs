@@ -37,7 +37,37 @@ namespace ZeissJwtDemo.Services
 
         public async Task RegisterAsync(UserRegisterViewModel viewModel)
         {
-            throw new NotImplementedException();
+            var user = new AppUser { Username = viewModel.Username };
+            byte[] passwordHash, passwordSalt;
+
+            CreatePasswordHash(viewModel.Password, out passwordHash, out passwordSalt);
+
+            user.PasswordHash = passwordHash;
+            user.PasswordSalt = passwordSalt;
+
+            await _context.AddAsync(user);
+            await _context.SaveChangesAsync();
+
+            foreach (var role in viewModel.Roles)
+            {
+                var modelRole = await GetRoleByNameAsync(role);
+
+                if (modelRole != null)
+                {
+                    var userRoleModel = new AppUserRole
+                    {
+                        AppUser = user,
+                        Role = modelRole,
+                        AppUserId = user.AppUserId,
+                        RoleId = modelRole.RoleId
+                    };
+
+                    //  add user-roles
+                    await _context.AddAsync(userRoleModel);
+                }
+            }
+
+            await _context.SaveChangesAsync();
         }
 
         private void CreatePasswordHash(string rawPassword, out byte[] passwordHash, out byte[] passwordSalt)
@@ -49,7 +79,7 @@ namespace ZeissJwtDemo.Services
             }
         }
 
-        public bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
+        private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
         {
             using (var hmac = new System.Security.Cryptography.HMACSHA512(passwordSalt))
             {
