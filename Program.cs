@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using ZeissJwtDemo.Context;
+using ZeissJwtDemo.Services;
 
 namespace ZeissJwtDemo
 {
@@ -14,6 +15,7 @@ namespace ZeissJwtDemo
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddControllers();
+            builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
