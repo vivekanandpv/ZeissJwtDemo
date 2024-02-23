@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34601.278
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeissJwtDemo", "ZeissJwtDemo.csproj", "{83CC2C01-6062-486A-AD32-D53CD9C67126}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{83CC2C01-6062-486A-AD32-D53CD9C67126}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83CC2C01-6062-486A-AD32-D53CD9C67126}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83CC2C01-6062-486A-AD32-D53CD9C67126}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83CC2C01-6062-486A-AD32-D53CD9C67126}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {387C01F3-29B9-4DF1-BF86-D8A94E5C059E}
+	EndGlobalSection
+EndGlobal
