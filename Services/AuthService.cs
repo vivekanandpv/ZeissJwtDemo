@@ -1,4 +1,5 @@
-﻿using ZeissJwtDemo.Context;
+﻿using Microsoft.EntityFrameworkCore;
+using ZeissJwtDemo.Context;
 using ZeissJwtDemo.Models;
 using ZeissJwtDemo.ViewModels;
 
@@ -17,7 +18,24 @@ namespace ZeissJwtDemo.Services
 
         public async Task<UserViewModel> GetByUsernameAsync(string username)
         {
-            throw new NotImplementedException();
+            var model = await _context.AppUsers
+                            .Include(u => u.AppUserRoles)
+                            .ThenInclude(ur => ur.Role)
+                            .FirstOrDefaultAsync(u =>
+                                u.Username == username);
+
+            if (model == null)
+            {
+                return null;
+            }
+
+            var roles = model.AppUserRoles.Select(r => r.Role.Name).ToList();
+
+            var viewModel = new UserViewModel { Username = model.Username, AppUserId = model.AppUserId };
+
+            viewModel.Roles = roles.ToArray();
+
+            return viewModel;
         }
 
         public async Task<Role> GetRoleByNameAsync(string roleName)
