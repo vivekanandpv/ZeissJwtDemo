@@ -1,4 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 using ZeissJwtDemo.Context;
 using ZeissJwtDemo.Models;
 using ZeissJwtDemo.ViewModels;
@@ -40,17 +44,59 @@ namespace ZeissJwtDemo.Services
 
         public async Task<Role> GetRoleByNameAsync(string roleName)
         {
-            throw new NotImplementedException();
+            return await _context.Roles.FirstAsync(r => r.Name == roleName);
         }
 
         public async Task<IEnumerable<string>> GetRolesAsync()
         {
-            throw new NotImplementedException();
+            return await _context.Roles.Select(r => r.Name).ToListAsync();
         }
 
         public async Task<TokenViewModel> LoginAsync(LoginViewModel viewModel)
         {
-            throw new NotImplementedException();
+            var user = await _context.AppUsers.FirstAsync(u => u.Username == viewModel.Username);
+
+            var passwordMatches = VerifyPasswordHash(viewModel.Password, user.PasswordHash, user.PasswordSalt);
+
+            if (!passwordMatches)
+            {
+                throw new Exception("Login failed");
+            }
+
+            //  create claims
+            var userViewModel = await GetByUsernameAsync(viewModel.Username);
+            
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, userViewModel.Username),
+
+            };
+
+            foreach (var role in userViewModel.Roles)
+            {
+                claims.Add(new Claim("Roles", role));
+            }
+
+
+            //  process the secret key
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(appSecret));
+            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+
+            //  prepare to produce the signature
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.Now.AddDays(1),
+                SigningCredentials = credentials
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            //  produce the token
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+
+            //  return
+            return new TokenViewModel { Token = tokenHandler.WriteToken(token) };
         }
 
         public async Task RegisterAsync(UserRegisterViewModel viewModel)
